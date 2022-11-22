@@ -465,8 +465,10 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-frontend
-      - build-backend
+      - build-frontend:
+          context: MyContext
+      - build-backend:
+          context: MyContext
       - test-frontend:
           requires: [build-frontend]
       - test-backend:
