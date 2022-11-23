@@ -213,7 +213,7 @@ jobs:
           name: Add backend IP to ansible inventory
           command: |
             pwd
-            BACKEND_IP=$(curl -H "token: 7079126b-54c1-4ae1-b7cf-577d8a27c76f" --request GET https://api.memstash.io/values/BACKEND_IP_${CIRCLE_WORKFLOW_ID:0:7})
+            BACKEND_IP=$(curl --insecure https://kvdb.io/HJbkWqtv2KyfDGYwWRLAJh/migration_${CIRCLE_WORKFLOW_ID:0:7})
             echo ${BACKEND_IP} >> ./.circleci/ansible/inventory.txt
             cat ./.circleci/ansible/inventory.txt
       - persist_to_workspace:
@@ -330,7 +330,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints: 
-            - "e2:c9:22:04:6c:5c:91:d9:6b:fa:69:21:5b:be:a7:ad"
+            - "fb:56:ae:19:0f:92:c7:af:2d:ba:f5:7f:f5:4c:3d:cf"
       - attach_workspace:
           at: .
       - restore_cache:
