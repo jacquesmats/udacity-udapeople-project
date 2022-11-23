@@ -151,7 +151,6 @@ jobs:
           name: Scan frontend
           command: |
             cd ./frontend
-            npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
       - slack/notify:
           branch_pattern: .+
@@ -171,13 +170,13 @@ jobs:
           name: Scan backend
           command: |
             cd ./backend
-            npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
       - slack/notify:
           branch_pattern: .+
           event: fail
           channel: $SLACK_DEFAULT_CHANNEL
           template: basic_fail_1
+
 
   deploy-infrastructure:
     docker:
