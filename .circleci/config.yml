@@ -210,16 +210,6 @@ jobs:
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
       - run:
-          name: Send backend IP to memstash
-          command: |
-            pwd
-            BACKEND_IP=$(aws ec2 describe-instances \
-              --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --output text)
-            echo "BACKEND_IP=${BACKEND_IP}"
-            curl -H "Content-Type: text/plain" -H "token: 7079126b-54c1-4ae1-b7cf-577d8a27c76f" --request PUT --data "$BACKEND_IP" https://api.memstash.io/values/BACKEND_IP_${CIRCLE_WORKFLOW_ID:0:7}
-      - run:
           name: Add backend IP to ansible inventory
           command: |
             pwd
@@ -243,7 +233,7 @@ jobs:
           at: .
       - add_ssh_keys:
           fingerprints: 
-            - "e2:c9:22:04:6c:5c:91:d9:6b:fa:69:21:5b:be:a7:ad"
+            - "fb:56:ae:19:0f:92:c7:af:2d:ba:f5:7f:f5:4c:3d:cf"
       - run:
           name: Install dependencies
           command: |
@@ -279,16 +269,13 @@ jobs:
             npm run migrations > migrations_log.txt
             cat ./migrations_log.txt
       - run:
-          name: Send database migration status to memstash
-          command: |
-            if grep "has been executed successfully" ./backend/migrations_log.txt;
-            then
-              echo "Database migration has been executed successfully"
-              curl -H "Content-Type: text/plain" -H "token: 7079126b-54c1-4ae1-b7cf-577d8a27c76f" --request PUT --data "success" https://api.memstash.io/values/DB_MIGRATION_STATUS_${CIRCLE_WORKFLOW_ID:0:7}
-            else
-              echo "Database migration has failed, verify DB setup!"
-              curl -H "Content-Type: text/plain" -H "token: 7079126b-54c1-4ae1-b7cf-577d8a27c76f" --request PUT --data "failure" https://api.memstash.io/values/DB_MIGRATION_STATUS_${CIRCLE_WORKFLOW_ID:0:7}
-            fi
+          name: Send migration status to kvdb.io OR memstash.io
+          command: |   
+              if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+              then
+                  # If you are using kvdb.io, generate the bucket ID "9GE4jRtKznmVKRfvdBABBe" in your local terminal first
+                  curl https://kvdb.io/HJbkWqtv2KyfDGYwWRLAJh/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+              fi
       - destroy-environment:
           workflowID: ${CIRCLE_WORKFLOW_ID:0:7}       
 
@@ -309,7 +296,7 @@ jobs:
       - run:
           name: Get backend url and setup environment variables
           command: |
-            BACKEND_IP=$(curl -H "token: 7079126b-54c1-4ae1-b7cf-577d8a27c76f" --request GET https://api.memstash.io/values/BACKEND_IP_${CIRCLE_WORKFLOW_ID:0:7})
+            BACKEND_IP=$(curl --insecure https://kvdb.io/HJbkWqtv2KyfDGYwWRLAJh/migration_${CIRCLE_WORKFLOW_ID:0:7})
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             echo ENVIRONMENT=production > "frontend/.env"
