@@ -348,7 +348,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update npm
+            apk add --update npm nodejs
             apk add --update ansible
             apk add --no-cache curl
             apk add --no-cache openssh-client
