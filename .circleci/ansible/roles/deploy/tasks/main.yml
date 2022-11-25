@@ -3,9 +3,7 @@
   become: true
   shell: |
     npm cache clean -f
-    npm install -g npm@latest
-    npm install -g n
-    n stable
+    npm install -g npm@stable
 
 - name: Copy compiled files
   unarchive:
