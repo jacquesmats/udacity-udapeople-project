@@ -2,6 +2,7 @@
 - name: Upgrade npm
   become: true
   shell: |
+    source ~/.nvm/nvm.sh
     nvm install 18.12.1
     npm cache clean -f
     npm install -g npm@latest
