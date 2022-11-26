@@ -4,7 +4,7 @@
   shell: |
     nvm install 18.12.1
     npm cache clean -f
-    npm install -g npm@stable
+    npm install -g npm@latest
 
 - name: Copy compiled files
   unarchive:
